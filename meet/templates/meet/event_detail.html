@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block h1 %}
+Social Meetup
+{% endblock %}
+
+{% block content %}
+<div class="container">
+        <div class="row">
+            <div class="col-md-3 mx-auto">
+                <div class="mt-5">
+                    <h4 class="m-3">Admin: {{ event.host.username }}</h4>
+                </div>
+                <div class="mt-5">
+                    <h4 class="m-3">Event Members: </h4>
+                    {% for member in event.member.all %}
+                        <h5 class="m-2">{{ member.username }}</h5>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-9 col-12 mx-auto">
+                <div class="mt-1 mx-5 row justify-content-start">
+                    <div class="col-md-6 col-12">
+                        <h2 class="m-2">{{ event.group.name }} Event:</h2>
+                        <h2 class="m-2">{{ event.name }}</h2>
+                        {% if event.thumbnail %}
+                            <img class="w-100" src="{{ event.thumbnail.url }}">
+                        {% endif %}
+                        <h4 class="mt-3">{{ event.description }}</h4>
+                        <div class="mt-10">
+                            <div row>
+                                <div class="col">
+                                    <h5 class="text-start m-4">Details:</h5>
+                                    <h6 class="mt-1">Date: {{ event.held_date|date:"Md日" }}</h6>
+                                    <h6>Address: {{ event.address }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-4">
+                        <div class="d-flex align-items-end justify-content-center">
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary p-2 mt-5">Join/Leave {{ event.name }}</button>
+                            </form>
+                        </div>
+
+                        {% if request.user == event.host %}
+                        <div class="p-2 mt-4 bg-warning border rounded">
+                              <a class="text-light text-center" href="{% url 'meet:event_update' event.group.id event.id %}" style="text-decoration: none;">Update this Event</a>
+                        </div>
+                        <div class="p-2 mt-4 bg-danger border rounded">
+                              <a class="text-light text-center" href="{% url 'meet:event_delete' event.group.id event.id %}" style="text-decoration: none;">Disband this Event</a>
+                        </div>
+                        {% endif %}
+                        <div class="m-2">
+                            <h5 class="mt-5">Message Board:</h5>
+                            <div style="width: 300px; height: 150px;overflow-x: hidden; overflow-y: auto">
+                                {% for comment in comment_list %}
+                                    <p>{{ comment.poster.username }}: {{ comment.text }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if request.user in event.member.all or request.user == event.host %}
+                        <form action="{% url 'meet:comment_create' event.group.id event.id %}" method="post" class="m-1">
+                            {% csrf_token %}
+                            {{ comment_form }}
+                            <div>
+                                <button type="submit" class="btn btn-primary p-1 m-1">Submit</button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

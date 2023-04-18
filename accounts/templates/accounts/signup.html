@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block h1 %}Create an Account{% endblock %}
+{% block content %}
+    <form method="post" class="p-4 m-4 bg-light border border-success rounded form-group">
+    {% csrf_token %}
+    <input type="text" name="username" class="form-control my-4" placeholder="user ID">
+    <input type="text" name="first_name" class="form-control my-4" placeholder="First name">
+    <input type="text" name="last_name" class="form-control my-4" placeholder="Last name">
+    <input type="email" name="email" class="form-control my-4" placeholder="Email Address">
+    <input type="number" name="age" class="form-control my-4" placeholder="Age">
+    <input type="password" name="password1" class="form-control mt-4" placeholder="password">
+    <input type="password" name="password2" class="form-control mt-4" placeholder="password(again)">
+    <small class="mb-2 d-block text-start">Password must be at least 8 characters long</small>
+    {% if form.errors %}
+      <span class="mb-2 small text-danger d-block text-start">There is a possibility that the user ID or password cannot be used. Please check your input again.</span>
+    {% endif %}
+        <h6 class="mt-4">Select profile pic from your computer</h6>
+    <input type="file" name="thumbnail" class="form-control" placeholder="Profile image" accept="image/png, image/jpg, image/jpeg">
+    <button type="submit" class="btn btn-success m-4">Create</button>
+  </form>
+{% endblock %}

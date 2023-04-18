@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block h1 %}
+Social Meetup
+{% endblock %}
+
+{% block content %}
+    <h2>Create A New Group</h2>
+    <form action="" method="post" enctype="multipart/form-data" class="p-4 m-4 bg-light border border-success rounded form-group">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="group" value="{{ group.id }}">
+        <button type="submit" class="btn btn-success mt-4">Submit</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block h1 %}
+Social Meetup
+{% endblock %}
+
+{% block content %}
+<form method="post">
+        {% csrf_token %}
+    <button type="submit">Delete {{ event.name }}</button>
+</form>
+{% endblock %}

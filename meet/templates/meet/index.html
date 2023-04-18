@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block h1 %}
+    Social Meetup
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-5">
+            <form class="d-flex" action="{% url 'meet:index' %}" method="get">
+                <input name="q" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </form>
+        </div>
+        {% if request.user.is_authenticated %}
+        <div class="col-2">
+            <div class="p-1 m-1 bg-primary border border-primary rounded">
+                <a class="text-light text-center" href="{% url 'meet:index' %}?q=mygroup" style="text-decoration: none;">Show My Groups</a>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="p-1 m-1 bg-danger border border-danger rounded">
+                <a class="text-light text-center" href="{% url 'meet:group_create' %}" style="text-decoration: none;">Create A New Group</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% for group in group_list %}
+        <a href="{% url 'meet:group_detail' group.id %}">
+            <div class="row">
+                <div class="col-md-3 px-md-0 col-12">
+                    {% if group.thumbnail %}
+                    <img src="{{ group.thumbnail.url }}" class="w-100">
+                    {% endif %}
+                </div>
+                <div class="col-md-9 p-3 col-12">
+                    <h3>{{ group.name }}</h3>
+                    <div class="text-start text-truncate">
+                        {{ group.description }}
+                    </div>
+                    <div class="mt-1">
+                    [
+                    {% for tag in group.tag.all %}
+                        {% if forloop.counter <= 5 %}
+                        {{ tag.name }},
+                        {% endif %}
+                    {% endfor %}
+                    .....]
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+{% endblock %}
