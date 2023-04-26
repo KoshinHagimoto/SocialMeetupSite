@@ -2,18 +2,25 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from accounts.models import get_all_logged_in_users
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils import timezone
 
 from .models import Tag, Group, Event, Comment
 from .forms import GroupForm, EventForm, CommentForm
+from .tasks import send_notification
 
 
 class MeetIndexView(ListView):
     model = Group
     template_name = "meet/index.html"
     context_object_name = "group_list"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['logged_in_users'] = get_all_logged_in_users()
+        return context
 
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset(**kwargs)
@@ -29,6 +36,7 @@ class MeetGroupCreateView(LoginRequiredMixin, CreateView):
     template_name = 'meet/group_create.html'
     model = Group
     form_class = GroupForm
+    success_url = reverse_lazy('meet:index')
 
     def form_valid(self, form):
         form.instance.host = self.request.user
@@ -39,7 +47,7 @@ class MeetGroupCreateView(LoginRequiredMixin, CreateView):
             for tag in tag_list:
                 group.tag.add(Tag.objects.get_or_create(name=tag)[0])
         form.save_m2m()
-        self.success_url = reverse_lazy('meet:index')
+        send_notification(group, 'Created Group')
         return super().form_valid(form)
 
 
@@ -54,6 +62,7 @@ class MeetEventCreateView(LoginRequiredMixin, CreateView):
         event = form.save(commit=False)
         event.group = group
         event.save()
+        send_notification(event, 'event')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -98,6 +107,12 @@ class MeetGroupUpdateView(UpdateView):
             raise PermissionDenied
         return obj
 
+    def form_valid(self, form):
+        group = form.save(commit=False)
+        group.save()
+        send_notification(group, 'Updated Group')
+        return super().form_valid(form)
+
     def get_success_url(self):
         return reverse('meet:group_detail', kwargs={'pk': self.object.id})
 
@@ -112,6 +127,12 @@ class MeetEventUpdateView(UpdateView):
         if obj.host != self.request.user:
             raise PermissionDenied
         return obj
+
+    def form_valid(self, form):
+        event = form.save(commit=False)
+        event.save()
+        send_notification(event, 'Updated Group')
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('meet:event_detail', kwargs={'group_id': self.object.group.id, 'pk':self.object.id})
@@ -137,15 +158,17 @@ def group_detail_view(request, **kwargs):
     context = dict()
     context["group"] = group
     context['previous_events'] = Event.objects.filter(group__id=kwargs['pk']).filter(
-        held_date__lte=timezone.now()).order_by('-held_date')
+        held_date__lte=timezone.now()).order_by('held_date')
     context['upcoming_events'] = Event.objects.filter(group__id=kwargs['pk']).filter(
         held_date__gte=timezone.now()).order_by('held_date')
 
     if request.method == 'POST':
         if Group.objects.filter(id=kwargs['pk']).filter(member__exact=request.user):
             group.member.remove(request.user)
+            send_notification(group, 'member removed')
         else:
             group.member.add(request.user)
+            send_notification(group, 'member added')
     return render(request, template_name, context)
 
 
@@ -161,7 +184,9 @@ def event_detail_view(request, **kwargs):
     if request.method == 'POST':
         if Event.objects.filter(id=kwargs['pk']).filter(member__exact=request.user):
             event.member.remove(request.user)
+            send_notification(event, 'member removed')
         else:
             event.member.add(request.user)
+            send_notification(event, 'member added')
     return render(request, template_name, context)
 

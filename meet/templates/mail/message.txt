@@ -1,0 +1,7 @@
+DataBase was updated!
+
+content: {{ action }}
+created_at : {{ item.dateAdded }}
+host: {{ item.host.username }}
+
+http://localhost:8000/meet/detail/{{ item.pk }}

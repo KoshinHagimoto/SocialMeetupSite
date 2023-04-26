@@ -13,9 +13,10 @@
     </label>
     <input class="form-control" name="username">
     <label>
-        PASSOWORD
+        PASSWORD
     </label>
     <input type="password" class="form-control" name="password">
     <button type="submit" class="btn btn-sucesss mt-4">Login</button>
   </form>
+    <p><a href="{% url 'accounts:password_reset' %}">Forgot Your Password?</a>
 {% endblock content %}

@@ -28,7 +28,7 @@
     {% for group in group_list %}
         <a href="{% url 'meet:group_detail' group.id %}">
             <div class="row">
-                <div class="col-md-3 px-md-0 col-12">
+                <div class="col-md-2 px-md-0 col-12">
                     {% if group.thumbnail %}
                     <img src="{{ group.thumbnail.url }}" class="w-100">
                     {% endif %}
@@ -51,4 +51,16 @@
             </div>
         </a>
     {% endfor %}
+    {% if request.user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-8 col-6">
+            <h5 class="text-center m-2">Currently Logged in:</h5>
+            <div class="row">
+                {% for user in logged_in_users %}
+                    <h6 class="text-center">{{ user.username }}</h6>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

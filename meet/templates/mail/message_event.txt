@@ -1,0 +1,7 @@
+New {{ action }} was Created !!
+
+event: {{ item.name }}
+host: {{ item.host.username }}
+held date: {{ item.held_date }}
+
+http://localhost:8000/meet/detail/{{ item.group.id }}/detail/{{ item.pk }}/
