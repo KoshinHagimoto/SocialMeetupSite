@@ -29,13 +29,12 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.11.9']
+ALLOWED_HOSTS = ['192.168.11.9', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'meet.apps.MeetConfig',
-    'chat.apps.ChatConfig',
 ]
 
 MIDDLEWARE = [
@@ -155,15 +153,3 @@ DEFAULT_TO_EMAIL = os.getenv('DEFAULT_TO_EMAIL')
 PASSWORD_RESET_TIMEOUT = 300
 
 CELERY_BROKER_URL = 'amqp://localhost'
-
-#Channels
-ASGI_APPLICATION = 'SocialMeetup.asgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': "channels_redis.core.RedisChannelLayer",
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
-    },
-}
