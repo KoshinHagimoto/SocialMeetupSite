@@ -1,6 +1,9 @@
 # Social Media Meetup Site
 Djangoを用いて個人開発したWebサイト(アプリケーション)
 
+## Demo
+https://user-images.githubusercontent.com/127278864/235580257-8c20d03e-da89-4d46-bf5f-942071f3e9ff.mp4
+
 ## About
 同じような興味を持つ人々の間でグループや対面ミーティングの発足を目的とした、ソーシャルメディアのウェブサイト
 
